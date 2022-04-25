@@ -1,4 +1,4 @@
-module microservice-go-demo
+module product-api-go-demo
 
 go 1.18
 

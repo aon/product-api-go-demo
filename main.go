@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"log"
-	"microservice-go-demo/handlers"
 	"net/http"
 	"os"
 	"os/signal"
+	"product-api-go-demo/handlers"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -26,9 +26,11 @@ func main() {
 
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProducts)
+	putRouter.Use(ph.MiddlewareValidateProduct)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.Use(ph.MiddlewareValidateProduct)
 
 	// create a new server
 	s := &http.Server{
@@ -44,7 +46,8 @@ func main() {
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil {
-			l.Fatal(err)
+			l.Printf("Error starting server: %s\n", err)
+			os.Exit(1)
 		}
 	}()
 
